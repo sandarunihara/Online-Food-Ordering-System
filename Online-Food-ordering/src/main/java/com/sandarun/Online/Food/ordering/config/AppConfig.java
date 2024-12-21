@@ -34,7 +34,7 @@ public class AppConfig {
                 .csrf(csrf->csrf.disable())
                 .cors(cors->cors.configurationSource(corsconfigurationSource()));
 
-        return null;
+        return http.build();
     }
 
     private CorsConfigurationSource corsconfigurationSource() {
@@ -51,7 +51,7 @@ public class AppConfig {
                 config.setAllowedHeaders(Collections.singletonList("*"));
                 config.setExposedHeaders(Arrays.asList("Authorization"));
                 config.setMaxAge(3600L);
-                return null;
+                return config;
             }
         };
     }

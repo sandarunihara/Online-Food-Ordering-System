@@ -33,7 +33,6 @@ public class CustomerUserDetailsService implements UserDetailsService {
 
         authorities.add(new SimpleGrantedAuthority(role.toString()));
 
-//        return  null;
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
     }
 }
