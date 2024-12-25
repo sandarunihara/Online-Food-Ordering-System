@@ -22,6 +22,7 @@ public class RestaurantCotroller {
     @Autowired
     private UserService userService;
 
+
     @GetMapping("/search")
     public ResponseEntity<List<Restaurant>> searchRestaurant(@RequestHeader("Authorization") String jwt, @RequestParam String keyword)throws Exception {
         User user=userService.findUserByJwtToken(jwt);
