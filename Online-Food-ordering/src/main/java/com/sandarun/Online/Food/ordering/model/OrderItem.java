@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "orders")
+@Table(name = "order_items")
 public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -22,6 +22,12 @@ public class OrderItem {
 
     private int quantity;
     private Long totalPrice;
+
+    @ElementCollection
     private  List<String> ingredients;
+
+    @ManyToOne
+    @JoinColumn(name = "order_id", nullable = false) // Explicit join
+    private Order order; 
 
 }

@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
+@Table(name = "`order`")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -34,7 +35,7 @@ public class Order {
     @ManyToOne
     private Address deliveruAddress;
 
-    @OneToMany
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items;
 
 //    private Payment payment;
