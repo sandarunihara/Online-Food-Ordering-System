@@ -3,6 +3,7 @@ package com.sandarun.Online.Food.ordering.service;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.sandarun.Online.Food.ordering.model.Cart;
 import com.sandarun.Online.Food.ordering.model.CartItem;
@@ -12,6 +13,7 @@ import com.sandarun.Online.Food.ordering.repository.CartItemRepository;
 import com.sandarun.Online.Food.ordering.repository.CartRepository;
 import com.sandarun.Online.Food.ordering.request.AddCardItemRequest;
 
+@Service
 public class CartServiceImp implements CartService{
 
     @Autowired
