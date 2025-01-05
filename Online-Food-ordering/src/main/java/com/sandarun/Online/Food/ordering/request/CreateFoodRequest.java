@@ -1,8 +1,8 @@
 package com.sandarun.Online.Food.ordering.request;
 
 import java.util.List;
-import java.util.Locale.Category;
 
+import com.sandarun.Online.Food.ordering.model.Category;
 import com.sandarun.Online.Food.ordering.model.IngredientsItems;
 
 import lombok.Data;
