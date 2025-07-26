@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#22c55e" />
+    <meta
+      name="description"
+      content="FoodX - Your favorite food delivery app. Order from the best restaurants and get it delivered to your doorstep."
+    />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    
+    <!-- Preconnect to Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <title>FoodX - Food Delivery Made Easy</title>
+    
+    <!-- Meta tags for SEO -->
+    <meta property="og:title" content="FoodX - Food Delivery Made Easy" />
+    <meta property="og:description" content="Order from your favorite restaurants and get delicious food delivered to your doorstep. Fast, fresh, and always satisfying." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://foodx-app.com" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="FoodX - Food Delivery Made Easy" />
+    <meta name="twitter:description" content="Order from your favorite restaurants and get delicious food delivered to your doorstep." />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍽️</text></svg>">
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('SW registered: ', registration);
+            })
+            .catch((registrationError) => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+    </script>
+  </body>
+</html>
