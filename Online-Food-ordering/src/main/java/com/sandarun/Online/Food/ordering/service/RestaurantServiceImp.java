@@ -99,7 +99,7 @@ public class RestaurantServiceImp implements RestaurantService {
         Restaurant restaurant=restaurantRepository.findByOwnerId(userId);
 
         if(restaurant==null){
-            throw new Exception("Restaurant not found with id: "+userId);
+            throw new Exception("Restaurant not found for this user");
         }
         return restaurant;
     }

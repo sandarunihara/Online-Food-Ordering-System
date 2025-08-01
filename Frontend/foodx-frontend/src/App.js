@@ -4,6 +4,8 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import Navbar from './components/Navbar';
+import ProtectedRoute from './components/ProtectedRoute';
+import AuthDebug from './components/AuthDebug';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -13,6 +15,7 @@ import Cart from './pages/Cart';
 import Profile from './pages/Profile';
 import Orders from './pages/Orders';
 import AdminDashboard from './pages/AdminDashboard';
+import CreateRestaurant from './pages/CreateRestaurant';
 import Footer from './components/Footer';
 
 function App() {
@@ -29,13 +32,40 @@ function App() {
                 <Route path="/register" element={<Register />} />
                 <Route path="/restaurants" element={<Restaurants />} />
                 <Route path="/restaurant/:id" element={<RestaurantDetail />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/orders" element={<Orders />} />
-                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/cart" element={
+                  <ProtectedRoute>
+                    <Cart />
+                  </ProtectedRoute>
+                } />
+                <Route path="/profile" element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                } />
+                <Route path="/orders" element={
+                  <ProtectedRoute>
+                    <Orders />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin" element={
+                  <ProtectedRoute requiredRole="ROLE_RESTAURANT_OWNER">
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin-dashboard" element={
+                  <ProtectedRoute requiredRole="ROLE_RESTAURANT_OWNER">
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/create-restaurant" element={
+                  <ProtectedRoute requiredRole="ROLE_RESTAURANT_OWNER">
+                    <CreateRestaurant />
+                  </ProtectedRoute>
+                } />
               </Routes>
             </main>
             <Footer />
+            {/* <AuthDebug /> */}
             <Toaster 
               position="top-right"
               toastOptions={{

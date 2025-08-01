@@ -1,6 +1,7 @@
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
-const API_BASE_URL = 'http://localhost:8080';
+const API_BASE_URL = 'http://localhost:5454';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -13,6 +14,8 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
+    console.log(token);
+    
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -28,9 +31,30 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
+      // Clear authentication data
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      window.location.href = '/login';
+      // Only redirect if not already on login/register page
+      if (!window.location.pathname.includes('/login') && !window.location.pathname.includes('/register')) {
+        window.location.href = '/login';
+      }
+    }
+    // Handle other errors
+    if (error.response?.status === 500) {
+      console.error('Internal Server Error');
+      toast.error('An unexpected error occurred. Please try again later.');
+    }else if (error.response?.status === 404) {
+      console.error('Resource Not Found');
+      toast.error('The requested resource was not found.');
+    }else if (error.response?.status === 403) {
+      console.error('Access Denied');
+      toast.error('You do not have permission to access this resource.');
+    }else if (error.response?.status === 400) {
+      console.error('Bad Request');
+      toast.error('Bad request. Please check your input.');
+    }else {
+      console.error('API Error:', error);
+      toast.error('An error occurred while processing your request.');
     }
     return Promise.reject(error);
   }
@@ -41,6 +65,8 @@ export const authAPI = {
   login: (credentials) => api.post('/auth/signin', credentials),
   register: (userData) => api.post('/auth/signup', userData),
   getProfile: () => api.get('/api/users/profile'),
+  refreshToken: () => api.post('/auth/refresh'),
+  logout: () => api.post('/auth/logout'),
 };
 
 // Restaurant Services
@@ -52,6 +78,8 @@ export const restaurantAPI = {
   create: (restaurantData) => api.post('/api/admin/restaurants', restaurantData),
   update: (id, restaurantData) => api.put(`/api/admin/restaurants/${id}`, restaurantData),
   updateStatus: (id) => api.put(`/api/admin/restaurants/${id}/status`),
+  getByUser: () => api.get('/api/admin/restaurants/user'), // Get restaurant owned by current user
+  delete: (id) => api.delete(`/api/admin/restaurants/${id}`),
 };
 
 // Food Services
@@ -98,3 +126,29 @@ export const userAPI = {
 };
 
 export default api;
+
+// Utility functions
+export const isAuthenticated = () => {
+  const token = localStorage.getItem('token');
+  const user = localStorage.getItem('user');
+  return !!(token && user);
+};
+
+export const getAuthToken = () => {
+  return localStorage.getItem('token');
+};
+
+export const getAuthUser = () => {
+  const user = localStorage.getItem('user');
+  try {
+    return user ? JSON.parse(user) : null;
+  } catch (error) {
+    console.error('Error parsing user data:', error);
+    return null;
+  }
+};
+
+export const clearAuthData = () => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+};

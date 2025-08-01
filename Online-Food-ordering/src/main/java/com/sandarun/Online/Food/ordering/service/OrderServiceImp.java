@@ -50,8 +50,8 @@ public class OrderServiceImp implements OrderService{
 
         Address savedAdress=addressRepository.save(shipAddress);
 
-        if(!user.getAddress().contains(savedAdress)){
-            user.getAddress().add(savedAdress);
+        if(!user.getAddresses().contains(savedAdress)){
+            user.getAddresses().add(savedAdress);
             userRepository.save(user);
         }
 

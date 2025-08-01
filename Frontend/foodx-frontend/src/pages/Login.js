@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '../context/AuthContext';
 import { Mail, Lock, Eye, EyeOff, ChefHat } from 'lucide-react';
@@ -9,11 +9,15 @@ const Login = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const { login, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Get the page user was trying to access before login
+  const from = location.state?.from?.pathname || '/';
 
   const onSubmit = async (data) => {
     const result = await login(data);
     if (result.success) {
-      navigate('/');
+      navigate(from, { replace: true });
     }
   };
 

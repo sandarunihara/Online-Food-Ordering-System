@@ -72,11 +72,14 @@ export const AuthProvider = ({ children }) => {
       const response = await authAPI.login(credentials);
       const { jwt, message, role } = response.data;
       
-      // Get user profile
+      // Store token temporarily for the profile request
+      localStorage.setItem('token', jwt);
+      
+      // Get user profile with the new token
       const userResponse = await authAPI.getProfile();
       const user = userResponse.data;
       
-      localStorage.setItem('token', jwt);
+      // Store user data
       localStorage.setItem('user', JSON.stringify(user));
       
       dispatch({
@@ -88,6 +91,8 @@ export const AuthProvider = ({ children }) => {
       return { success: true };
     } catch (error) {
       dispatch({ type: 'SET_LOADING', payload: false });
+      // Clear token if login failed
+      localStorage.removeItem('token');
       const message = error.response?.data?.message || 'Login failed';
       toast.error(message);
       return { success: false, message };
@@ -95,16 +100,22 @@ export const AuthProvider = ({ children }) => {
   };
 
   const register = async (userData) => {
+    console.log('userData in register:', userData);
+    
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
       const response = await authAPI.register(userData);
-      const { jwt, message } = response.data;
+      const { jwt, message, role } = response.data;
       
-      // Get user profile
+      // Store token temporarily for the profile request
+      localStorage.setItem('token', jwt);
+      
+      // Get user profile with the new token
       const userResponse = await authAPI.getProfile();
       const user = userResponse.data;
+      console.log('userResponse', user);
       
-      localStorage.setItem('token', jwt);
+      // Store user data
       localStorage.setItem('user', JSON.stringify(user));
       
       dispatch({
@@ -116,6 +127,8 @@ export const AuthProvider = ({ children }) => {
       return { success: true };
     } catch (error) {
       dispatch({ type: 'SET_LOADING', payload: false });
+      // Clear token if registration failed
+      localStorage.removeItem('token');
       const message = error.response?.data?.message || 'Registration failed';
       toast.error(message);
       return { success: false, message };

@@ -30,7 +30,10 @@ const Profile = () => {
         email: user.email || '',
         phone: user.phone || '',
       });
-      setAddresses(user.address || []);
+      // Check both 'addresses' and 'address' properties to handle different API responses
+      setAddresses(user.addresses || user.address || []);
+      console.log('user data loaded:', user);
+      console.log('addresses loaded:', user.addresses || user.address || []);
     }
   }, [user]);
 
@@ -65,8 +68,19 @@ const Profile = () => {
 
   const handleAddAddress = async () => {
     try {
-      await userAPI.addAddress(newAddress);
+      const response = await userAPI.addAddress(newAddress);
       toast.success('Address added successfully');
+      
+      // Update the addresses state directly instead of reloading the page
+      if (response.data && response.data.addresses) {
+        setAddresses(response.data.addresses);
+        console.log('New address added:', response.data);
+        updateUser(response.data);
+      } else {
+        // Fallback: reload page if response doesn't contain updated addresses
+        window.location.reload();
+      }
+      
       setNewAddress({
         street: '',
         city: '',
@@ -75,8 +89,6 @@ const Profile = () => {
         country: '',
       });
       setShowAddressForm(false);
-      // Refresh user data
-      window.location.reload();
     } catch (error) {
       console.error('Error adding address:', error);
       toast.error('Failed to add address');

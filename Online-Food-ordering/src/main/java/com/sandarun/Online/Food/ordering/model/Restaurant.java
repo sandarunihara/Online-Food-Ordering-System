@@ -27,7 +27,8 @@ public class Restaurant {
     private String description;
     private String cuisineType;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "res_id")
     private  Address address;
 
     @Embedded

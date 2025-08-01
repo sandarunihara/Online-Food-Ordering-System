@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table(name = "users")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -35,10 +36,11 @@ public class User {
     private List<Order> orders=new ArrayList<>();
 
     @ElementCollection
-    private List<RestaurantDto>favorites=new ArrayList();
+    private List<RestaurantDto>favorites=new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private  List<Address> address=new ArrayList<>();
+    @JoinColumn(name = "user_id") // This creates the foreign key in Address table
+    private List<Address> addresses = new ArrayList<>();
 
 
 }

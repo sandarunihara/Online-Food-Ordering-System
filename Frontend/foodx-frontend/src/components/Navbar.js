@@ -111,6 +111,16 @@ const Navbar = () => {
                         <Heart className="w-4 h-4" />
                         <span>My Orders</span>
                       </Link>
+                      {user?.role === 'ROLE_RESTAURANT_OWNER' && (
+                        <Link
+                          to="/admin"
+                          className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          onClick={() => setIsProfileOpen(false)}
+                        >
+                          <ChefHat className="w-4 h-4" />
+                          <span>Admin Dashboard</span>
+                        </Link>
+                      )}
                       <hr className="my-1" />
                       <button
                         onClick={handleLogout}

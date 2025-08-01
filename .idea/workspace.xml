@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="74e1b75b-c10a-4679-9427-42f816f2cb61" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Online-Food-ordering/src/main/java/com/sandarun/Online/Food/ordering/controller/OrderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Online-Food-ordering/src/main/java/com/sandarun/Online/Food/ordering/controller/OrderController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Online-Food-ordering/src/main/java/com/sandarun/Online/Food/ordering/service/CustomerUserDetailsService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Online-Food-ordering/src/main/java/com/sandarun/Online/Food/ordering/service/CustomerUserDetailsService.java" afterDir="false" />
-    </list>
+    <list default="true" id="74e1b75b-c10a-4679-9427-42f816f2cb61" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -13,6 +10,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "sandarunihara"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/sandarunihara/Online-Food-Ordering-System.git",
+    "accountId": "9bb497c4-921e-4577-98d7-95bb3c577c76"
+  }
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 8
 }</component>
@@ -21,18 +30,31 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;E:/Web Des/projects/Online-Food-Ordering-System&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "E:/Web Des/projects/Online-Food-Ordering-System/Online-Food-ordering",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="Online-Food-Ordering-System" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="Online-Food-Ordering-System" />
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -51,6 +73,7 @@
       <updated>1751803023283</updated>
       <workItem from="1751803024376" duration="21000" />
       <workItem from="1751805059942" duration="188000" />
+      <workItem from="1753520929361" duration="37000" />
     </task>
     <servers />
   </component>
