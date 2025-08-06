@@ -87,14 +87,23 @@ export const foodAPI = {
   getByRestaurant: (restaurantId) => api.get(`/api/food/restaurant/${restaurantId}`),
   search: (keyword, restaurantId) => api.get(`/api/food/search?keyword=${keyword}&restaurantId=${restaurantId}`),
   getByCategory: (categoryId, restaurantId) => api.get(`/api/food/restaurant/${restaurantId}/category/${categoryId}`),
-  create: (foodData) => api.post('/api/admin/food', foodData),
+  create: (foodData) => {
+    const config = {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      }
+    };
+    return api.post('/api/admin/food', foodData, config);
+  },
+  createWithoutImages: (foodData) => api.post('/api/admin/food', foodData),
   update: (id, foodData) => api.put(`/api/admin/food/${id}`, foodData),
-  updateAvailability: (id) => api.put(`/api/admin/food/${id}/availability`),
+  updateAvailability: (id) => api.put(`/api/admin/food/${id}`),
+  delete: (id) => api.delete(`/api/admin/food/${id}`),
 };
 
 // Category Services
 export const categoryAPI = {
-  getByRestaurant: (restaurantId) => api.get(`/api/category/restaurant/${restaurantId}`),
+  getByRestaurant: () => api.get(`/api/category/restaurant`),
   create: (categoryData) => api.post('/api/admin/category', categoryData),
 };
 

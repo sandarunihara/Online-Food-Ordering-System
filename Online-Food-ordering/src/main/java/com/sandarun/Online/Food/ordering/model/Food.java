@@ -1,10 +1,12 @@
 package com.sandarun.Online.Food.ordering.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -31,6 +33,7 @@ public class Food {
 
     private  boolean available;
 
+    @JsonIgnore
     @ManyToOne
     private  Restaurant restaurant;
 
@@ -40,5 +43,5 @@ public class Food {
     @ManyToMany
     private  List<IngredientsItems> ingredients =new ArrayList<>();
 
-    private Date creationDate;
+    private LocalDateTime creationDate;
 }

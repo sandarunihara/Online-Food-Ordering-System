@@ -41,6 +41,17 @@ const AdminDashboard = () => {
       setRestaurant(restaurantData);
 
       if (restaurantData && restaurantData.id) {
+
+        // console.log(restaurantData.id);
+        
+        const food=await foodAPI.getByRestaurant(restaurantData.id);
+        // console.log(food.data);
+        setRestaurant(prev => ({
+          ...prev,
+          foods: food.data || []
+        }));
+        
+
         // Get orders for this restaurant
         const ordersResponse = await orderAPI.getRestaurantOrders(restaurantData.id);
         setOrders(ordersResponse.data || []);
@@ -177,6 +188,39 @@ const AdminDashboard = () => {
               </div>
             </div>
 
+            {/* Quick Actions */}
+            {(!restaurant?.foods || restaurant.foods.length === 0) && (
+              <div className="bg-gradient-to-r from-primary-50 to-accent-50 rounded-xl border border-primary-200 p-6 mb-8">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-primary-900 mb-2">
+                      🚀 Get Started with Your Menu
+                    </h3>
+                    <p className="text-primary-700 mb-4">
+                      You haven't added any food items yet. Let's get your menu set up!
+                    </p>
+                    <div className="flex flex-wrap gap-3">
+                      <button
+                        onClick={() => navigate('/add-category')}
+                        className="bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+                      >
+                        1. Create Categories
+                      </button>
+                      <button
+                        onClick={() => navigate('/add-food')}
+                        className="bg-white hover:bg-primary-50 text-primary-600 border border-primary-300 font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+                      >
+                        2. Add Food Items
+                      </button>
+                    </div>
+                  </div>
+                  <div className="ml-4 text-4xl">
+                    🍴
+                  </div>
+                </div>
+              </div>
+            )}
+
         {/* Quick Actions */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Recent Orders */}
@@ -214,36 +258,56 @@ const AdminDashboard = () => {
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold text-gray-900">Menu Management</h2>
-              <button className="btn-primary">Add Item</button>
+              <div className="flex space-x-2">
+                <button 
+                  onClick={() => navigate('/add-category')}
+                  className="btn-outline text-sm"
+                >
+                  Manage Categories
+                </button>
+                <button 
+                  onClick={() => navigate('/manage-food')}
+                  className="btn-outline text-sm"
+                >
+                  View All Food
+                </button>
+                <button 
+                  onClick={() => navigate('/add-food')}
+                  className="btn-primary"
+                >
+                  Add Item
+                </button>
+              </div>
             </div>
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div>
-                  <p className="font-medium text-gray-900">Chicken Burger</p>
-                  <p className="text-sm text-gray-600">$12.99 • Available</p>
+              {restaurant?.foods && restaurant.foods.length > 0 ? (
+                restaurant.foods.slice(0, 3).map((food) => (
+                  <div key={food.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div>
+                      <p className="font-medium text-gray-900">{food.name}</p>
+                      <p className="text-sm text-gray-600">
+                        ${(food.price / 100).toFixed(2)} • {food.available ? 'Available' : 'Out of Stock'}
+                      </p>
+                    </div>
+                    <button 
+                      onClick={() => navigate('/manage-food')}
+                      className="text-primary-600 hover:text-primary-700 font-medium"
+                    >
+                      View All
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <p className="mb-4">No menu items yet</p>
+                  <button 
+                    onClick={() => navigate('/add-food')}
+                    className="btn-primary text-sm"
+                  >
+                    Add Your First Item
+                  </button>
                 </div>
-                <button className="text-primary-600 hover:text-primary-700 font-medium">
-                  Edit
-                </button>
-              </div>
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div>
-                  <p className="font-medium text-gray-900">Caesar Salad</p>
-                  <p className="text-sm text-gray-600">$8.99 • Available</p>
-                </div>
-                <button className="text-primary-600 hover:text-primary-700 font-medium">
-                  Edit
-                </button>
-              </div>
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div>
-                  <p className="font-medium text-gray-900">Pasta Carbonara</p>
-                  <p className="text-sm text-red-600">$15.99 • Out of Stock</p>
-                </div>
-                <button className="text-primary-600 hover:text-primary-700 font-medium">
-                  Edit
-                </button>
-              </div>
+              )}
             </div>
           </div>
         </div>

@@ -1,8 +1,10 @@
 package com.sandarun.Online.Food.ordering.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,7 +12,9 @@ import org.springframework.stereotype.Service;
 import com.sandarun.Online.Food.ordering.model.Category;
 import com.sandarun.Online.Food.ordering.model.Food;
 import com.sandarun.Online.Food.ordering.model.Restaurant;
+import com.sandarun.Online.Food.ordering.model.IngredientsItems;
 import com.sandarun.Online.Food.ordering.repository.FoodRepository;
+import com.sandarun.Online.Food.ordering.repository.IngredientItemsRepository;
 import com.sandarun.Online.Food.ordering.request.CreateFoodRequest;
 
 @Service
@@ -18,6 +22,9 @@ public class FoodServiceImp implements FoodService {
 
     @Autowired
     private FoodRepository foodRepository;
+
+    @Autowired
+    private IngredientItemsRepository ingredientItemsRepository;
 
     @Override
     public Food createFood(CreateFoodRequest req, Category category, Restaurant restaurant) {
@@ -29,9 +36,36 @@ public class FoodServiceImp implements FoodService {
         food.setImages(req.getImages());
         food.setName(req.getName());
         food.setPrice(req.getPrice());
-        food.setIngredients(req.getIngredients());
         food.setSeasonal(req.isSeasional());
         food.setVegetarian(req.isVegetarian());
+        food.setCreationDate(LocalDateTime.now());
+
+        // Handle ingredients - save them first if they don't exist
+        List<IngredientsItems> savedIngredients = new ArrayList<>();
+        if (req.getIngredients() != null) {
+            for (IngredientsItems ingredient : req.getIngredients()) {
+                // Set the restaurant reference for new ingredients
+                ingredient.setRestaurant(restaurant);
+                
+                // Check if ingredient already exists by name and restaurant
+                List<IngredientsItems> existingIngredients = ingredientItemsRepository.findByRestaurantId(restaurant.getId());
+                IngredientsItems existingIngredient = existingIngredients.stream()
+                    .filter(ing -> ing.getName().equalsIgnoreCase(ingredient.getName()))
+                    .findFirst()
+                    .orElse(null);
+                
+                if (existingIngredient != null) {
+                    // Use existing ingredient
+                    savedIngredients.add(existingIngredient);
+                } else {
+                    // Save new ingredient
+                    IngredientsItems savedIngredient = ingredientItemsRepository.save(ingredient);
+                    savedIngredients.add(savedIngredient);
+                }
+            }
+        }
+        
+        food.setIngredients(savedIngredients);
 
         Food savedFood = foodRepository.save(food);
         restaurant.getFoods().add(savedFood);
@@ -48,23 +82,22 @@ public class FoodServiceImp implements FoodService {
     }
 
     @Override
-    public List<Food> getRestaurantsFood(Long restaurantId, boolean isVegitarian, boolean isNonveg, boolean isSeasonal,
-            String foodCategory) {
+    public List<Food> getRestaurantsFood(Long restaurantId) {
 
         List<Food> foods = foodRepository.findByRestaurantId(restaurantId);
 
-        if (isVegitarian) {
-            foods = filterByVegitarian(foods, isVegitarian);
-        }
-        if (isNonveg) {
-            foods = filterByNonveg(foods, isNonveg);
-        }
-        if (isSeasonal) {
-            foods = filterBySeasonal(foods, isSeasonal);
-        }
-        if (foodCategory != null && !foodCategory.equals("")) {
-            foods = filterByCategory(foods, foodCategory);
-        }
+//        if (isVegitarian) {
+//            foods = filterByVegitarian(foods, isVegitarian);
+//        }
+//        if (isNonveg) {
+//            foods = filterByNonveg(foods, isNonveg);
+//        }
+//        if (isSeasonal) {
+//            foods = filterBySeasonal(foods, isSeasonal);
+//        }
+//        if (foodCategory != null && !foodCategory.equals("")) {
+//            foods = filterByCategory(foods, foodCategory);
+//        }
 
         return foods;
     }

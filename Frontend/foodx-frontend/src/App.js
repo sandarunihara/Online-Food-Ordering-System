@@ -16,6 +16,10 @@ import Profile from './pages/Profile';
 import Orders from './pages/Orders';
 import AdminDashboard from './pages/AdminDashboard';
 import CreateRestaurant from './pages/CreateRestaurant';
+import AddFood from './pages/AddFood';
+import AddCategory from './pages/AddCategory';
+import ManageFood from './pages/ManageFood';
+import EditFood from './pages/EditFood';
 import Footer from './components/Footer';
 
 function App() {
@@ -60,6 +64,26 @@ function App() {
                 <Route path="/create-restaurant" element={
                   <ProtectedRoute requiredRole="ROLE_RESTAURANT_OWNER">
                     <CreateRestaurant />
+                  </ProtectedRoute>
+                } />
+                <Route path="/add-food" element={
+                  <ProtectedRoute requiredRole="ROLE_RESTAURANT_OWNER">
+                    <AddFood />
+                  </ProtectedRoute>
+                } />
+                <Route path="/add-category" element={
+                  <ProtectedRoute requiredRole="ROLE_RESTAURANT_OWNER">
+                    <AddCategory />
+                  </ProtectedRoute>
+                } />
+                <Route path="/manage-food" element={
+                  <ProtectedRoute requiredRole="ROLE_RESTAURANT_OWNER">
+                    <ManageFood />
+                  </ProtectedRoute>
+                } />
+                <Route path="/edit-food/:id" element={
+                  <ProtectedRoute requiredRole="ROLE_RESTAURANT_OWNER">
+                    <EditFood />
                   </ProtectedRoute>
                 } />
               </Routes>
