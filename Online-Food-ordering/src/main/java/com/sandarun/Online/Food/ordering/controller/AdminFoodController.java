@@ -59,6 +59,22 @@ public class AdminFoodController {
         return new ResponseEntity<>(res,HttpStatus.OK);
     }
 
+    @PutMapping("/{id}/update")
+    public ResponseEntity<Food> updateFood(@PathVariable Long id, @RequestBody CreateFoodRequest req, @RequestHeader("Authorization") String jwt) throws Exception {
+        
+        User user = userService.findUserByJwtToken(jwt);
+        
+        // Validate that the user owns the restaurant that contains this food
+        Food existingFood = foodService.findFoodByID(id);
+        if (!existingFood.getRestaurant().getOwner().getId().equals(user.getId())) {
+            throw new Exception("You are not authorized to update this food item");
+        }
+        
+        Food updatedFood = foodService.updateFood(id, req, req.getCategory());
+        
+        return new ResponseEntity<>(updatedFood, HttpStatus.OK);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<Food> updateFoodAvalibilityStatus(@PathVariable Long id,@RequestHeader("Authorization") String jwt)throws Exception{
         

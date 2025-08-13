@@ -42,6 +42,8 @@ const AddCategory = () => {
       // Get existing categories for this restaurant
       if (restaurantData.id) {
         const categoriesResponse = await categoryAPI.getByRestaurant(restaurantData.id);
+        console.log("Categories Response:", categoriesResponse);
+
         if(!categoriesResponse){
             if (categoriesResponse.status === 404) {
               toast.error('No categories found for this restaurant.');

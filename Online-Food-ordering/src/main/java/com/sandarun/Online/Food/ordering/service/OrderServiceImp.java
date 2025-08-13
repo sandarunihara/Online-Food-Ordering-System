@@ -17,7 +17,6 @@ import com.sandarun.Online.Food.ordering.model.OrderItem;
 import com.sandarun.Online.Food.ordering.model.Restaurant;
 import com.sandarun.Online.Food.ordering.model.User;
 import com.sandarun.Online.Food.ordering.repository.AddressRepository;
-import com.sandarun.Online.Food.ordering.repository.OrderItemRepository;
 import com.sandarun.Online.Food.ordering.repository.OrderRepository;
 import com.sandarun.Online.Food.ordering.repository.UserRepository;
 import com.sandarun.Online.Food.ordering.request.OrderRequest;
@@ -27,9 +26,6 @@ public class OrderServiceImp implements OrderService{
 
     @Autowired 
     private OrderRepository orderRepository;
-
-    @Autowired
-    private OrderItemRepository orderItemRepository;
 
     @Autowired
     private AddressRepository addressRepository;
@@ -45,10 +41,11 @@ public class OrderServiceImp implements OrderService{
 
     @Override
     public Order createOrder(OrderRequest order, User user)throws Exception{
-    
-        Address shipAddress=order.getDeliveryAddress();
 
-        Address savedAdress=addressRepository.save(shipAddress);
+        Address savedAdress=order.getDeliveryAddress();
+
+//        System.out.println("\n"+order+"\n");
+//        Address savedAdress=addressRepository.save(shipAddress);
 
         if(!user.getAddresses().contains(savedAdress)){
             user.getAddresses().add(savedAdress);
@@ -66,6 +63,10 @@ public class OrderServiceImp implements OrderService{
 
         Cart cart=cartService.findCartByUserId(user.getId());
 
+        // Calculate total price first
+        Long totalPrice=cartService.calculateCartTotals(cart);
+        createOrder.setTotalPrice(totalPrice);
+
         List<OrderItem> orderItems=new ArrayList<>();
 
         for(CartItem cartItem : cart.getItem()){
@@ -74,19 +75,19 @@ public class OrderServiceImp implements OrderService{
             orderItem.setIngredients(cartItem.getIngredients());
             orderItem.setQuantity(cartItem.getQuantity());
             orderItem.setTotalPrice(cartItem.getTotalPrice());
+            orderItem.setOrder(createOrder); // Set the parent order
 
-            OrderItem savedOrderItem=orderItemRepository.save(orderItem);
-            orderItems.add(savedOrderItem);
+            orderItems.add(orderItem);
         }
-        Long totalPrice=cartService.calculateCartTotals(cart);
 
+        // Set the items to the order before saving
         createOrder.setItems(orderItems);
-        createOrder.setTotalPrice(totalPrice);
 
+        // Save the order with cascade - this will automatically save all OrderItems
         Order savedOrder=orderRepository.save(createOrder);
         restaurant.getOrders().add(savedOrder);
         
-        return createOrder;
+        return savedOrder;
     }
 
     @Override
@@ -103,7 +104,8 @@ public class OrderServiceImp implements OrderService{
     @Override
     public void cancelOrder(Long orderId) throws Exception {
     
-        Order order=findOrderById(orderId);
+        // Verify order exists before deletion
+        findOrderById(orderId);
         orderRepository.deleteById(orderId);
     }
 

@@ -18,6 +18,7 @@ public class UserController {
 
     @GetMapping("/profile")
     public ResponseEntity<User> findUserByJwtToken(@RequestHeader("Authorization") String jwt) throws Exception {
+//        System.out.println("\nsadasd\n");
         User user = userService.findUserByJwtToken(jwt);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
@@ -30,12 +31,12 @@ public class UserController {
     }
 
     @PostMapping("/address")
-    public ResponseEntity<MessageResponse> addAddress(@RequestBody UpdateUserRequest request, @RequestHeader("Authorization") String jwt) throws Exception {
+    public ResponseEntity<User> addAddress(@RequestBody UpdateUserRequest request, @RequestHeader("Authorization") String jwt) throws Exception {
         User user = userService.findUserByJwtToken(jwt);
-        userService.updateUser(user.getId(), request);
+        User updatedUser=userService.updateUser(user.getId(), request);
         
         MessageResponse response = new MessageResponse();
         response.setMessage("Address added successfully");
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 }

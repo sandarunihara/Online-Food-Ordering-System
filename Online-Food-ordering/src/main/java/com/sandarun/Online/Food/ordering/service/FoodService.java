@@ -21,4 +21,6 @@ public interface FoodService {
 
     public Food updateAvailibilityStatus(Long foodId)throws Exception;
 
+    public Food updateFood(Long foodId, CreateFoodRequest req, Category category) throws Exception;
+
 }

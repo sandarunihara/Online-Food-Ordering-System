@@ -37,6 +37,8 @@ const Profile = () => {
     }
   }, [user]);
 
+  
+
   const handleInputChange = (e) => {
     setFormData({
       ...formData,

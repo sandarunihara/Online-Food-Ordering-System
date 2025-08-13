@@ -39,6 +39,7 @@ public class FoodServiceImp implements FoodService {
         food.setSeasonal(req.isSeasional());
         food.setVegetarian(req.isVegetarian());
         food.setCreationDate(LocalDateTime.now());
+        food.setRes_id(restaurant.getId());
 
         // Handle ingredients - save them first if they don't exist
         List<IngredientsItems> savedIngredients = new ArrayList<>();
@@ -142,6 +143,60 @@ public class FoodServiceImp implements FoodService {
     public Food updateAvailibilityStatus(Long foodId) throws Exception {
         Food food=findFoodByID(foodId);
         food.setAvailable(!food.isAvailable());
+        return foodRepository.save(food);
+    }
+
+    @Override
+    public Food updateFood(Long foodId, CreateFoodRequest req, Category category) throws Exception {
+        Food food = findFoodByID(foodId);
+        
+        // Update basic food information
+        if (req.getName() != null && !req.getName().trim().isEmpty()) {
+            food.setName(req.getName());
+        }
+        if (req.getDescription() != null && !req.getDescription().trim().isEmpty()) {
+            food.setDescription(req.getDescription());
+        }
+        if (req.getPrice() != null) {
+            food.setPrice(req.getPrice());
+        }
+        if (category != null) {
+            food.setCategory(category);
+        }
+        if (req.getImages() != null) {
+            food.setImages(req.getImages());
+        }
+        
+        // Update boolean fields
+        food.setVegetarian(req.isVegetarian());
+        food.setSeasonal(req.isSeasional());
+        
+        // Handle ingredients update - similar to create logic
+        if (req.getIngredients() != null) {
+            List<IngredientsItems> savedIngredients = new ArrayList<>();
+            for (IngredientsItems ingredient : req.getIngredients()) {
+                // Set the restaurant reference for new ingredients
+                ingredient.setRestaurant(food.getRestaurant());
+                
+                // Check if ingredient already exists by name and restaurant
+                List<IngredientsItems> existingIngredients = ingredientItemsRepository.findByRestaurantId(food.getRestaurant().getId());
+                IngredientsItems existingIngredient = existingIngredients.stream()
+                    .filter(ing -> ing.getName().equalsIgnoreCase(ingredient.getName()))
+                    .findFirst()
+                    .orElse(null);
+                
+                if (existingIngredient != null) {
+                    // Use existing ingredient
+                    savedIngredients.add(existingIngredient);
+                } else {
+                    // Save new ingredient
+                    IngredientsItems savedIngredient = ingredientItemsRepository.save(ingredient);
+                    savedIngredients.add(savedIngredient);
+                }
+            }
+            food.setIngredients(savedIngredients);
+        }
+        
         return foodRepository.save(food);
     }
 

@@ -2,12 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, MapPin, Clock, Star, ChefHat, Utensils, Coffee, Pizza } from 'lucide-react';
 import { restaurantAPI } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 const Home = () => {
   const [restaurants, setRestaurants] = useState([]);
   const [featuredRestaurants, setFeaturedRestaurants] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
+  const {user} = useAuth();
+  console.log('user in Home:', user);
+  
 
   useEffect(() => {
     fetchRestaurants();
@@ -16,16 +20,25 @@ const Home = () => {
   const fetchRestaurants = async () => {
     try {
       const response = await restaurantAPI.getAll();
-      const restaurantsData = response.data;
-      setRestaurants(restaurantsData);
-      // Get featured restaurants (first 6)
-      setFeaturedRestaurants(restaurantsData.slice(0, 6));
+      const data = response.data;
+      if (Array.isArray(data)) {
+        setRestaurants(data);
+        setFeaturedRestaurants(data.slice(0, 6));
+      } else {
+        console.warn('Restaurants data is not an array:1234', data);
+        setRestaurants([data]);
+        setFeaturedRestaurants([data.slice(0, 6)]);
+      }
     } catch (error) {
       console.error('Error fetching restaurants:', error);
+      setRestaurants([]);
+      setFeaturedRestaurants([]);
     } finally {
       setLoading(false);
     }
   };
+  // console.log('Fetched restaurants:', restaurants);
+  // console.log('Featured restaurants:', featuredRestaurants);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -160,59 +173,73 @@ const Home = () => {
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featuredRestaurants.map((restaurant) => (
-                <Link
-                  key={restaurant.id}
-                  to={`/restaurant/${restaurant.id}`}
-                  className="restaurant-card group"
-                >
-                  <div className="relative h-48 overflow-hidden rounded-t-xl">
-                    <img
-                      src={restaurant.images?.[0] || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80'}
-                      alt={restaurant.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute top-4 right-4">
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        restaurant.open 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {restaurant.open ? 'Open' : 'Closed'}
-                      </span>
-                    </div>
+            <>
+              {Array.isArray(featuredRestaurants) && featuredRestaurants.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {featuredRestaurants.map((restaurant) => (
+                    <Link
+                      key={restaurant.id}
+                      to={`/restaurant/${restaurant.id}`}
+                      className="restaurant-card group"
+                    >
+                      <div className="relative h-48 overflow-hidden rounded-t-xl">
+                        <img
+                          src={restaurant.images?.[0] || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80'}
+                          alt={restaurant.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                        <div className="absolute top-4 right-4">
+                          <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                            restaurant.open 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-red-100 text-red-800'
+                          }`}>
+                            {restaurant.open ? 'Open' : 'Closed'}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="p-6">
+                        <h3 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">
+                          {restaurant.name}
+                        </h3>
+                        <p className="text-gray-600 mb-4 line-clamp-2">
+                          {restaurant.description}
+                        </p>
+                        <div className="flex items-center justify-between text-sm text-gray-500">
+                          <div className="flex items-center space-x-1">
+                            <MapPin className="w-4 h-4" />
+                            <span>{restaurant.address?.city || 'City'}</span>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <Clock className="w-4 h-4" />
+                            <span>{restaurant.openingHours || '30-45 min'}</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between mt-4">
+                          <span className="text-sm font-medium text-primary-600">
+                            {restaurant.cuisineType}
+                          </span>
+                          <div className="flex items-center space-x-1">
+                            <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                            <span className="text-sm font-medium">4.5</span>
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <Utensils className="w-8 h-8 text-gray-400" />
                   </div>
-                  <div className="p-6">
-                    <h3 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">
-                      {restaurant.name}
-                    </h3>
-                    <p className="text-gray-600 mb-4 line-clamp-2">
-                      {restaurant.description}
-                    </p>
-                    <div className="flex items-center justify-between text-sm text-gray-500">
-                      <div className="flex items-center space-x-1">
-                        <MapPin className="w-4 h-4" />
-                        <span>{restaurant.address?.city || 'City'}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Clock className="w-4 h-4" />
-                        <span>{restaurant.openingHours || '30-45 min'}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between mt-4">
-                      <span className="text-sm font-medium text-primary-600">
-                        {restaurant.cuisineType}
-                      </span>
-                      <div className="flex items-center space-x-1">
-                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                        <span className="text-sm font-medium">4.5</span>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No restaurants found</h3>
+                  <p className="text-gray-500">
+                    We're working on adding restaurants to your area. Please check back soon!
+                  </p>
+                </div>
+              )}
+            </>
           )}
 
           <div className="text-center mt-8 md:hidden">

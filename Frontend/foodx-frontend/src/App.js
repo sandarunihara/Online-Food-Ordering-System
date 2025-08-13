@@ -20,6 +20,8 @@ import AddFood from './pages/AddFood';
 import AddCategory from './pages/AddCategory';
 import ManageFood from './pages/ManageFood';
 import EditFood from './pages/EditFood';
+import ManageOrders from './pages/ManageOrders';
+import Payment from './pages/Payment';
 import Footer from './components/Footer';
 
 function App() {
@@ -86,6 +88,16 @@ function App() {
                     <EditFood />
                   </ProtectedRoute>
                 } />
+                  <Route path="/manage-orders" element={
+                    <ProtectedRoute requiredRole="ROLE_RESTAURANT_OWNER">
+                      <ManageOrders />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/payment" element={
+                    <ProtectedRoute>
+                      <Payment />
+                    </ProtectedRoute>
+                  } />
               </Routes>
             </main>
             <Footer />

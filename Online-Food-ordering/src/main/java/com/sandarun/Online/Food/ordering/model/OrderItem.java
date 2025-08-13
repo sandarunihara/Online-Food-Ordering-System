@@ -1,5 +1,6 @@
 package com.sandarun.Online.Food.ordering.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,6 +28,7 @@ public class OrderItem {
     private  List<String> ingredients;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "order_id", nullable = false) // Explicit join
     private Order order; 
 

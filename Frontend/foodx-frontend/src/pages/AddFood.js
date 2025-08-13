@@ -39,6 +39,8 @@ const AddFood = () => {
       
       // Get restaurant owned by current user
       const restaurantResponse = await restaurantAPI.getByUser();
+      console.log("Restaurant Response:", restaurantResponse);
+      
       const restaurantData = restaurantResponse?.data;
       
       if (!restaurantData) {
@@ -51,7 +53,7 @@ const AddFood = () => {
       
       // Get categories for this restaurant
       if (restaurantData.id) {
-        const categoriesResponse = await categoryAPI.getByRestaurant();
+        const categoriesResponse = await categoryAPI.getByRestaurant(restaurantData.id);
         setCategories(categoriesResponse.data || []);
       }
     } catch (error) {

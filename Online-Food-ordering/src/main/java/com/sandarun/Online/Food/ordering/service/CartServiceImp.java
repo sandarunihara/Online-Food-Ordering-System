@@ -37,6 +37,14 @@ public class CartServiceImp implements CartService{
 
         Cart cart=cartRepository.findByCustomerId(user.getId());
 
+        // Create a new cart if user doesn't have one
+        if(cart == null) {
+            cart = new Cart();
+            cart.setCustomer(user);
+            cart.setTotal(0L);
+            cart = cartRepository.save(cart);
+        }
+
         for(CartItem cartItem:cart.getItem()){
             if(cartItem.getFood().equals(food)){
                 int newQuantity=cartItem.getQuantity()+req.getQuantity();
@@ -53,6 +61,12 @@ public class CartServiceImp implements CartService{
 
         CartItem savedCartItem=cartItemRepository.save(newCartItem);
         cart.getItem().add(savedCartItem);
+
+        Long total = cart.getTotal();
+        long value = total.longValue(); // This line throws NullPointerException if total is null
+
+        cart.setTotal(value+req.getQuantity());
+        cartRepository.save(cart);
 
         return savedCartItem;
     }
@@ -78,6 +92,11 @@ public class CartServiceImp implements CartService{
         User user=userService.findUserByJwtToken(jwt);
 
         Cart cart=cartRepository.findByCustomerId(user.getId());
+        
+        // Handle case where cart doesn't exist
+        if(cart == null) {
+            throw new Exception("Cart not found for user");
+        }
         
         Optional<CartItem> cartItemOptional=cartItemRepository.findById(cartItemId);
         if(cartItemOptional.isEmpty()){
@@ -116,6 +135,14 @@ public class CartServiceImp implements CartService{
     public Cart findCartByUserId(Long userId) throws Exception {
         
         Cart cart = cartRepository.findByCustomerId(userId);
+        
+        // Create a new empty cart if user doesn't have one
+        if(cart == null) {
+            cart = new Cart();
+            cart.setTotal(0L);
+            return cart; // Return a new empty cart (not saved to DB yet)
+        }
+        
         cart.setTotal(calculateCartTotals(cart));
         return cart;
     }

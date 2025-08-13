@@ -55,6 +55,7 @@ const RestaurantDetail = () => {
       setLoading(false);
     }
   };
+  console.log("restaurant:", restaurant);
 
   const handleAddToCart = async (food) => {
     if (!isAuthenticated) {
@@ -237,7 +238,7 @@ const RestaurantDetail = () => {
                       <p className="text-gray-600 mb-3 line-clamp-2">{food.description}</p>
                       <div className="flex items-center justify-between">
                         <span className="text-xl font-bold text-primary-600">
-                          ${(food.price / 100).toFixed(2)}
+                          ${(food.price).toFixed(2)}
                         </span>
                         {food.available ? (
                           <div className="flex items-center space-x-3">

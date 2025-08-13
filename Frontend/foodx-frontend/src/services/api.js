@@ -42,19 +42,19 @@ api.interceptors.response.use(
     // Handle other errors
     if (error.response?.status === 500) {
       console.error('Internal Server Error');
-      toast.error('An unexpected error occurred. Please try again later.');
+      // toast.error('An unexpected error occurred. Please try again later.');
     }else if (error.response?.status === 404) {
       console.error('Resource Not Found');
-      toast.error('The requested resource was not found.');
+      // toast.error('The requested resource was not found.');
     }else if (error.response?.status === 403) {
       console.error('Access Denied');
-      toast.error('You do not have permission to access this resource.');
+      // toast.error('You do not have permission to access this resource.');
     }else if (error.response?.status === 400) {
       console.error('Bad Request');
-      toast.error('Bad request. Please check your input.');
+      // toast.error('Bad request. Please check your input.');
     }else {
       console.error('API Error:', error);
-      toast.error('An error occurred while processing your request.');
+      // toast.error('An error occurred while processing your request.');
     }
     return Promise.reject(error);
   }
@@ -85,6 +85,7 @@ export const restaurantAPI = {
 // Food Services
 export const foodAPI = {
   getByRestaurant: (restaurantId) => api.get(`/api/food/restaurant/${restaurantId}`),
+  getById: (id) => api.get(`/api/food/${id}`),
   search: (keyword, restaurantId) => api.get(`/api/food/search?keyword=${keyword}&restaurantId=${restaurantId}`),
   getByCategory: (categoryId, restaurantId) => api.get(`/api/food/restaurant/${restaurantId}/category/${categoryId}`),
   create: (foodData) => {
@@ -96,14 +97,14 @@ export const foodAPI = {
     return api.post('/api/admin/food', foodData, config);
   },
   createWithoutImages: (foodData) => api.post('/api/admin/food', foodData),
-  update: (id, foodData) => api.put(`/api/admin/food/${id}`, foodData),
+  update: (id, foodData) => api.put(`/api/admin/food/${id}/update`, foodData),
   updateAvailability: (id) => api.put(`/api/admin/food/${id}`),
   delete: (id) => api.delete(`/api/admin/food/${id}`),
 };
 
 // Category Services
 export const categoryAPI = {
-  getByRestaurant: () => api.get(`/api/category/restaurant`),
+  getByRestaurant: (restaurantId) => api.get(`/api/category/restaurant/${restaurantId}`),
   create: (categoryData) => api.post('/api/admin/category', categoryData),
 };
 

@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { orderAPI } from '../services/api';
-import { Minus, Plus, Trash2, ShoppingBag, CreditCard } from 'lucide-react';
+import { Minus, Plus, Trash2, ShoppingBag, CreditCard, MapPin, Edit } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useAuth } from '../context/AuthContext';
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -16,9 +17,33 @@ const Cart = () => {
     clearCart,
     refreshCart 
   } = useCart();
+  const {user} = useAuth();
+
+  console.log('Cart items:', items);
   
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [deliveryAddress, setDeliveryAddress] = useState('');
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
+  const [useCustomAddress, setUseCustomAddress] = useState(false);
+
+  useEffect(() => {
+    if (user?.addresses && user.addresses.length > 0) {
+      setSelectedAddressId(user.addresses[0].id);
+    }
+  }, [user]);
+
+  const getSelectedAddress = () => {
+    if (useCustomAddress) {
+      return deliveryAddress;
+    }
+    if (selectedAddressId) {
+      const address = user?.addresses?.find(addr => addr.id === selectedAddressId);
+      if (address) {
+        return `${address.street}, ${address.city}, ${address.state} ${address.postalCode}, ${address.country}`;
+      }
+    }
+    return '';
+  };
 
   useEffect(() => {
     refreshCart();
@@ -36,33 +61,14 @@ const Cart = () => {
   };
 
   const handleCheckout = async () => {
-    if (!deliveryAddress.trim()) {
-      toast.error('Please enter a delivery address');
-      return;
-    }
-
-    try {
-      setIsCheckingOut(true);
-      const orderData = {
-        deliveryAddress: {
-          street: deliveryAddress,
-          city: 'Default City',
-          state: 'Default State',
-          postalCode: '12345',
-          country: 'Default Country'
-        }
-      };
-
-      await orderAPI.create(orderData);
-      toast.success('Order placed successfully!');
-      await clearCart();
-      navigate('/orders');
-    } catch (error) {
-      console.error('Checkout error:', error);
-      toast.error('Failed to place order. Please try again.');
-    } finally {
-      setIsCheckingOut(false);
-    }
+    // Instead of placing order, redirect to payment page
+    navigate('/payment', {
+      state: {
+        useCustomAddress,
+        deliveryAddress,
+        selectedAddressId
+      }
+    });
   };
 
   if (loading) {
@@ -165,10 +171,10 @@ const Cart = () => {
                       </div>
                       <div className="text-right">
                         <p className="font-semibold text-gray-900">
-                          ${((item.totalPrice || 0) / 100).toFixed(2)}
+                          ${((item.totalPrice || 0) ).toFixed(2)}
                         </p>
                         <p className="text-sm text-gray-500">
-                          ${((item.food?.price || 0) / 100).toFixed(2)} each
+                          ${((item.food?.price || 0)).toFixed(2)} each
                         </p>
                       </div>
                     </div>
@@ -197,7 +203,7 @@ const Cart = () => {
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Subtotal</span>
-                  <span className="font-medium">${(total / 100).toFixed(2)}</span>
+                  <span className="font-medium">${(total ).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Delivery Fee</span>
@@ -205,31 +211,148 @@ const Cart = () => {
                     {deliveryFee === 0 ? (
                       <span className="text-green-600">Free</span>
                     ) : (
-                      `$${(deliveryFee / 100).toFixed(2)}`
+                      `$${(deliveryFee).toFixed(2)}`
                     )}
                   </span>
                 </div>
                 <div className="border-t pt-3">
                   <div className="flex justify-between">
                     <span className="font-semibold">Total</span>
-                    <span className="font-bold text-lg">${(totalWithDelivery / 100).toFixed(2)}</span>
+                    <span className="font-bold text-lg">${(totalWithDelivery).toFixed(2)}</span>
                   </div>
                 </div>
               </div>
 
               {/* Delivery Address */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Delivery Address
-                </label>
-                <textarea
-                  value={deliveryAddress}
-                  onChange={(e) => setDeliveryAddress(e.target.value)}
-                  placeholder="Enter your delivery address..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
-                  rows="3"
-                />
+                <div className="flex items-center justify-between mb-3">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Delivery Address
+                  </label>
+                  <Link 
+                    to="/profile" 
+                    className="text-sm text-primary-600 hover:text-primary-700 flex items-center gap-1"
+                  >
+                    <Edit className="w-3 h-3" />
+                    Manage Addresses
+                  </Link>
+                </div>
+
+                {/* Address Selection */}
+                {user?.addresses && user.addresses.length > 0 ? (
+                  <div className="space-y-3">
+                    {/* Saved Addresses */}
+                    <div className="space-y-2">
+                      {user.addresses.map((address) => (
+                        <div
+                          key={address.id}
+                          className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                            selectedAddressId === address.id && !useCustomAddress
+                              ? 'border-primary-500 bg-primary-50'
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                          onClick={() => {
+                            setSelectedAddressId(address.id);
+                            setUseCustomAddress(false);
+                          }}
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-start space-x-2">
+                              <input
+                                type="radio"
+                                name="address"
+                                checked={selectedAddressId === address.id && !useCustomAddress}
+                                onChange={() => {
+                                  setSelectedAddressId(address.id);
+                                  setUseCustomAddress(false);
+                                }}
+                                className="mt-1 text-primary-600"
+                              />
+                              <div>
+                                <div className="flex items-center gap-1">
+                                  <MapPin className="w-4 h-4 text-gray-400" />
+                                  <p className="text-sm font-medium text-gray-900">
+                                    {address.street}
+                                  </p>
+                                </div>
+                                <p className="text-sm text-gray-600 ml-5">
+                                  {address.city}, {address.state} {address.postalCode}
+                                </p>
+                                <p className="text-sm text-gray-600 ml-5">
+                                  {address.country}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Custom Address Option */}
+                    <div
+                      className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                        useCustomAddress
+                          ? 'border-primary-500 bg-primary-50'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                      onClick={() => setUseCustomAddress(true)}
+                    >
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          name="address"
+                          checked={useCustomAddress}
+                          onChange={() => setUseCustomAddress(true)}
+                          className="text-primary-600"
+                        />
+                        <label className="text-sm font-medium text-gray-900">
+                          Use different address
+                        </label>
+                      </div>
+                    </div>
+
+                    {/* Custom Address Input */}
+                    {useCustomAddress && (
+                      <textarea
+                        value={deliveryAddress}
+                        onChange={(e) => setDeliveryAddress(e.target.value)}
+                        placeholder="Enter your delivery address..."
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
+                        rows="3"
+                      />
+                    )}
+                  </div>
+                ) : (
+                  /* No saved addresses - show custom input */
+                  <div>
+                    <p className="text-sm text-gray-500 mb-2">
+                      No saved addresses found. 
+                      <Link to="/profile" className="text-primary-600 hover:text-primary-700 ml-1">
+                        Add an address in your profile
+                      </Link>
+                    </p>
+                    <textarea
+                      value={deliveryAddress}
+                      onChange={(e) => setDeliveryAddress(e.target.value)}
+                      placeholder="Enter your delivery address..."
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
+                      rows="3"
+                    />
+                  </div>
+                )}
               </div>
+
+              {/* Selected Address Confirmation */}
+              {getSelectedAddress() && (
+                <div className="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                  <p className="text-sm text-gray-700">
+                    <span className="font-medium">Delivering to:</span>
+                  </p>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {getSelectedAddress()}
+                  </p>
+                </div>
+              )}
 
               {/* Free Delivery Notice */}
               {total < 2500 && (
@@ -243,7 +366,11 @@ const Cart = () => {
               {/* Checkout Button */}
               <button
                 onClick={handleCheckout}
-                disabled={isCheckingOut || !deliveryAddress.trim()}
+                disabled={
+                  isCheckingOut || 
+                  (useCustomAddress && !deliveryAddress.trim()) || 
+                  (!useCustomAddress && !selectedAddressId && (!user?.addresses || user.addresses.length === 0) && !deliveryAddress.trim())
+                }
                 className="w-full btn-primary flex items-center justify-center space-x-2 py-3"
               >
                 {isCheckingOut ? (
@@ -254,7 +381,7 @@ const Cart = () => {
                 ) : (
                   <>
                     <CreditCard className="w-5 h-5" />
-                    <span>Proceed to Checkout</span>
+                    <span>Proceed to Payment</span>
                   </>
                 )}
               </button>

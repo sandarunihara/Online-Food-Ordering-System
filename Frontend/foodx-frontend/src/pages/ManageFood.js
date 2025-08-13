@@ -288,7 +288,7 @@ const ManageFood = () => {
                     <h3 className="text-lg font-semibold text-gray-900 truncate">{food.name}</h3>
                     <span className="text-lg font-bold text-primary-600">
                       ${typeof food.price === 'number' && food.price > 1000 
-                        ? (food.price / 100).toFixed(2)  // Convert from cents if it's a large number
+                        ? (food.price).toFixed(2)  // Convert from cents if it's a large number
                         : parseFloat(food.price).toFixed(2) // Use as is if it's already in dollars
                       }
                     </span>

@@ -12,14 +12,18 @@ const initialState = {
 };
 
 const cartReducer = (state, action) => {
+  // console.log('CartReducer - action:', action.type, 'payload:', action.payload);
+  
   switch (action.type) {
     case 'SET_CART':
-      return {
+      const newState = {
         ...state,
-        items: action.payload.items || [],
+        items: action.payload.item || [],
         total: action.payload.total || 0,
         loading: false,
       };
+      // console.log('CartReducer SET_CART - new state:', newState);
+      return newState;
     case 'SET_LOADING':
       return {
         ...state,
@@ -39,25 +43,68 @@ const cartReducer = (state, action) => {
 
 export const CartProvider = ({ children }) => {
   const [state, dispatch] = useReducer(cartReducer, initialState);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user, token } = useAuth();
 
   useEffect(() => {
     if (isAuthenticated) {
       fetchCart();
+    } else {
+      dispatch({ type: 'CLEAR_CART' });
     }
   }, [isAuthenticated]);
+  
+  // Also try to fetch cart on initial load if already authenticated
+  useEffect(() => {
+    // console.log('CartProvider initial load useEffect');
+    const token = localStorage.getItem('token');
+    const user = localStorage.getItem('user');
+    if (token && user && isAuthenticated) {
+      fetchCart();
+    }
+  }, []); // Empty dependency array for initial load only
 
   const fetchCart = async () => {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
+      // console.log('Fetching cart data...');
       const response = await cartAPI.get();
-      dispatch({ type: 'SET_CART', payload: response.data });
+      
+      // Handle different possible response structures
+      let cartData = response.data;
+      
+      // If response.data is the cart object directly
+      if (cartData && typeof cartData === 'object') {
+        // Check if it has items array
+        if (Array.isArray(cartData.item)) {
+          dispatch({ type: 'SET_CART', payload: cartData });
+        }
+        // Check if the response itself is an array (items directly)
+        else if (Array.isArray(cartData)) {
+          dispatch({ type: 'SET_CART', payload: { items: cartData, total: 0 } });
+        }
+        // Check if it has cartItems instead of items
+        else if (Array.isArray(cartData.cartItems)) {
+          dispatch({ type: 'SET_CART', payload: { items: cartData.cartItems, total: cartData.total || 0 } });
+        }
+        // Default case - assume empty cart
+        else {
+          // console.log('Unexpected cart data structure:11111111', cartData);
+          dispatch({ type: 'SET_CART', payload: { items: [], total: 0 } });
+        }
+      } else {
+        // console.log('No cart data or invalid response');
+        dispatch({ type: 'SET_CART', payload: { items: [], total: 0 } });
+      }
     } catch (error) {
       console.error('Error fetching cart:', error);
+      console.error('Error details:', error.response);
       dispatch({ type: 'SET_LOADING', payload: false });
+      // Set empty cart on error
+      dispatch({ type: 'SET_CART', payload: { items: [], total: 0 } });
     }
   };
 
+  
   const addToCart = async (foodId, quantity = 1, ingredients = []) => {
     try {
       const response = await cartAPI.addItem({
@@ -108,7 +155,7 @@ export const CartProvider = ({ children }) => {
     try {
       await cartAPI.clear();
       dispatch({ type: 'CLEAR_CART' });
-      toast.success('Cart cleared');
+      // toast.success('Cart cleared');
       return { success: true };
     } catch (error) {
       const message = error.response?.data?.message || 'Failed to clear cart';

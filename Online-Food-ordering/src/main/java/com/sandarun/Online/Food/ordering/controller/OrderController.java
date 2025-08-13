@@ -35,6 +35,7 @@ public class OrderController {
     public ResponseEntity<Order> createOrder(@RequestHeader ("Authorization") String jwt , @RequestBody OrderRequest req)throws Exception{
         
         User user=userService.findUserByJwtToken(jwt);
+        System.out.println("\n"+req+"\n");
         Order order=orderService.createOrder(req, user);
         return new ResponseEntity<>(order,HttpStatus.OK);
     }
